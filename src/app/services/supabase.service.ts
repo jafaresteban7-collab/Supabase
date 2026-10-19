@@ -75,4 +75,19 @@ export class SupabaseService {
     const { error } = await this.supabase.from('clients').delete().eq('id', id);
     if (error) throw error;
   }
+    // --- STORAGE: imágenes del bucket ---
+  async getImages(): Promise<{ name: string; url: string }[]> {
+    const { data, error } = await this.supabase.storage
+      .from('imagenes')
+      .list('', { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+    if (error) throw error;
+
+    // Quitamos carpetas y el archivo de relleno que crea Supabase
+    return (data || [])
+      .filter(f => !!f.id && f.name !== '.emptyFolderPlaceholder')
+      .map(f => ({
+        name: f.name,
+        url: this.supabase.storage.from('imagenes').getPublicUrl(f.name).data.publicUrl
+      }));
+  }
 }

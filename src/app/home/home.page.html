@@ -1,12 +1,10 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>DAM CRM - Gestión de Clientes</ion-title>
-    @if (user()) {
-      <ion-button slot="end" fill="clear" color="light" (click)="logout()">Salir</ion-button>
-    }
-  </ion-toolbar>
-</ion-header>
-
+<ion-toolbar color="primary">
+  <ion-title>DAM CRM - Gestión de Clientes</ion-title>
+  <ion-button slot="end" fill="clear" color="light" routerLink="/gallery">Galería</ion-button>
+  @if (user()) {
+    <ion-button slot="end" fill="clear" color="light" (click)="logout()">Salir</ion-button>
+  }
+</ion-toolbar>
 <ion-content class="ion-padding">
 
   @if (!user()) {

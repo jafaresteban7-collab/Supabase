@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Galería de imágenes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (loading) {
+    <div class="ion-text-center"><ion-spinner></ion-spinner></div>
+  } @else {
+    @if (errorMsg) {
+      <p>{{ errorMsg }}</p>
+    }
+    <ion-grid>
+      <ion-row>
+        @for (img of images; track img.name) {
+          <ion-col size="12" size-md="6" size-lg="4">
+            <ion-card>
+              <img [src]="img.url" [alt]="img.name" />
+              <ion-card-header>
+                <ion-card-title>{{ img.name }}</ion-card-title>
+              </ion-card-header>
+            </ion-card>
+          </ion-col>
+        } @empty {
+          <ion-col><p>No hay imágenes en el bucket.</p></ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  }
+</ion-content>
