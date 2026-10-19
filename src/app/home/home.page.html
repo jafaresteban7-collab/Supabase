@@ -1,20 +1,95 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>DAM CRM - Gestión de Clientes</ion-title>
+    @if (user()) {
+      <ion-button slot="end" fill="clear" color="light" (click)="logout()">Salir</ion-button>
+    }
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  @if (!user()) {
+    <!-- LOGIN (visible si no hay sesión) -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Iniciar sesión</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+          <ion-input label="Email" labelPlacement="stacked" type="email" formControlName="email"></ion-input>
+          <ion-input label="Contraseña" labelPlacement="stacked" type="password" formControlName="password"></ion-input>
+          <ion-button type="submit" expand="block" class="ion-margin-top" [disabled]="loginForm.invalid">
+            Entrar
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+
+    <!-- FORMULARIO DE CLIENTES (solo admins) -->
+    @if (isAdmin() === 'admin') {
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ editingClientId ? 'Editar Cliente' : 'Nuevo Cliente' }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <form [formGroup]="clientForm" (ngSubmit)="saveClient()">
+            <ion-input label="Nombre" labelPlacement="stacked" type="text" formControlName="nombre"></ion-input>
+            <ion-input label="Empresa" labelPlacement="stacked" type="text" formControlName="empresa"></ion-input>
+            <ion-input label="Email" labelPlacement="stacked" type="email" formControlName="email"></ion-input>
+
+            <div class="ion-margin-top">
+              <ion-button type="submit" expand="block" [disabled]="clientForm.invalid">
+                {{ editingClientId ? 'Actualizar' : 'Guardar' }}
+              </ion-button>
+              @if (editingClientId) {
+                <ion-button type="button" fill="clear" expand="block" color="medium" (click)="resetForm()">
+                  Cancelar
+                </ion-button>
+              }
+            </div>
+          </form>
+        </ion-card-content>
+      </ion-card>
+    }
+
+    <!-- LISTA DE CLIENTES (todos los usuarios) -->
+    <h3>Listado de Clientes</h3>
+    <ion-list>
+      @for (client of clients; track client.id) {
+        <ion-item-sliding>
+          <ion-item>
+            <ion-label>
+              <h2>{{ client.nombre }}</h2>
+              <p>{{ client.empresa }} | {{ client.email }}</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- Opciones al deslizar (solo admins) -->
+          @if (isAdmin() === 'admin') {
+            <ion-item-options side="end">
+              <ion-item-option color="primary" (click)="editClient(client)">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-item-option>
+              <ion-item-option color="danger" (click)="deleteClient(client.id!)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          }
+        </ion-item-sliding>
+      } @empty {
+        <ion-item>
+          <ion-label color="medium">No hay clientes registrados.</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    duration="2000"
+    (didDismiss)="setToastOpen(false)">
+  </ion-toast>
 </ion-content>
