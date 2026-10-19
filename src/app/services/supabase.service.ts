@@ -78,7 +78,7 @@ export class SupabaseService {
     // --- STORAGE: imágenes del bucket ---
   async getImages(): Promise<{ name: string; url: string }[]> {
     const { data, error } = await this.supabase.storage
-      .from('imagenes')
+      .from('galeria')
       .list('', { limit: 100, sortBy: { column: 'name', order: 'asc' } });
     if (error) throw error;
 
@@ -87,7 +87,7 @@ export class SupabaseService {
       .filter(f => !!f.id && f.name !== '.emptyFolderPlaceholder')
       .map(f => ({
         name: f.name,
-        url: this.supabase.storage.from('imagenes').getPublicUrl(f.name).data.publicUrl
+        url: this.supabase.storage.from('galeria').getPublicUrl(f.name).data.publicUrl
       }));
   }
 }
